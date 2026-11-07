@@ -1,16 +1,26 @@
 import { Component } from "@angular/core";
 import { TranslatePipe } from "@ngx-translate/core";
+import { Button } from "./button";
+import { ButtonVariant } from "../../modules/challenges/models/challenge-difficulty";
+
+type DifficultyOption = {
+    labelKey: string;
+    variant: ButtonVariant;
+};
 
 @Component({
     selector: 'app-difficulty-selector',
-    imports: [TranslatePipe],
+    imports: [Button, TranslatePipe],
     template: `
         <div class="flex flex-col items-center justify-center gap-2 sm:gap-4">
             <h2 class="text-xs sm:text-lg font-semibold text-white">{{ 'difficulties.select' | translate }}</h2>
             <div class="grid grid-cols-1 sm:grid-cols-3 w-full gap-2 sm:gap-4">
-                <button class="rounded bg-green-500 px-2 sm:px-4 py-1 text-white hover:bg-green-600 cursor-pointer">{{ 'difficulties.easy' | translate }}</button>
-                <button class="rounded bg-yellow-500 px-2 sm:px-4 py-1 text-white hover:bg-yellow-600 cursor-pointer">{{ 'difficulties.medium' | translate }}</button>
-                <button class="rounded bg-red-500 px-2 sm:px-4 py-1 text-white hover:bg-red-600 cursor-pointer">{{ 'difficulties.hard' | translate }}</button>
+                @for (option of difficultyOptions; track option.variant) {
+                    <app-button
+                        [labelKey]="option.labelKey"
+                        [variant]="option.variant"
+                    />
+                }
             </div>
         </div>
     `,
@@ -18,5 +28,9 @@ import { TranslatePipe } from "@ngx-translate/core";
     `
 })
 export class DifficultySelector {
-    constructor() {}
+    protected readonly difficultyOptions: DifficultyOption[] = [
+        { labelKey: 'difficulties.easy', variant: 'easy' },
+        { labelKey: 'difficulties.medium', variant: 'medium' },
+        { labelKey: 'difficulties.hard', variant: 'hard' },
+    ];
 }
