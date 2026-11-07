@@ -17,5 +17,5 @@
     (click)="closeChallengeSelector()"
   ></div>
 
-    <app-difficulty-selector />
+  <app-difficulty-selector (selected)="handleChallengeSelected($event)" />
 }

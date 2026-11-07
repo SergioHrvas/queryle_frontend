@@ -12,6 +12,11 @@ ng serve
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
+## API configuration
+
+The API base URL is configured in `src/environments/environment.ts`. Development builds use
+`src/environments/environment.development.ts`.
+
 ## Code scaffolding
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:

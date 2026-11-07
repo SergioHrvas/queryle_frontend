@@ -1,8 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
-import { Button } from '../../../shared/components/button';
-import { HOME_MENU_OPTIONS, HomeMenuOption } from '../home-menu-options';
+import { Button } from '@shared/components/button';
+import { HOME_MENU_OPTIONS, HomeMenuOption } from '@modules/home/home-menu-options';
 import { Router } from '@angular/router';
-import { DifficultySelector } from '../../../shared/components/difficulty-selector';
+import { DifficultySelector } from '@modules/challenges/components/difficulty-selector';
+import { DailyChallenge } from '@modules/challenges/models/challenge-difficulty';
 
 @Component({
   selector: 'app-home',
@@ -53,5 +54,10 @@ export class Home {
 
   protected closeChallengeSelector(): void {
     this.showChallengeSelector.set(false);
+  }
+
+  protected handleChallengeSelected(challenge: DailyChallenge): void {
+    this.closeChallengeSelector();
+    console.log(`Selected daily challenge: ${challenge.id}`);
   }
 }
