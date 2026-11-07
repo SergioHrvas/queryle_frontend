@@ -2,6 +2,15 @@
 
 @import 'tailwindcss';
 
+app-button {
+  --button-border: rgba(5, 150, 105, 0.5);
+  --button-background: #047857;
+  --button-hover-border: #10b981;
+  --button-hover-background: #059669;
+  --button-shadow: rgba(2, 44, 34, 0.2);
+  --button-ring: #34d399;
+}
+
 .main-content > router-outlet + * {
   display: flex;
   flex: 1;

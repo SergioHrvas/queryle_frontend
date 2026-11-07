@@ -12,6 +12,11 @@
     "select": "Selecciona la dificultad",
     "easy": "Fácil",
     "medium": "Medio",
-    "hard": "Difícil"
+    "hard": "Difícil",
+    "empty": "No hay retos disponibles"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "No se han podido cargar los retos"
   }
 }
