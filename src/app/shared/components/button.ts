@@ -1,20 +1,17 @@
 import { Component, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LucideDynamicIcon, LucideIcon } from '@lucide/angular';
 
 @Component({
   selector: 'app-button',
-  imports: [RouterLink, TranslatePipe, LucideDynamicIcon],
+  imports: [TranslatePipe, LucideDynamicIcon],
   template: `
-    <a
-      [routerLink]="route()"
+    <button
       class="
         group box-border grid w-full min-w-0 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-3
         rounded-xl border border-emerald-600/50
-        bg-emerald-700 px-4 py-3
-        font-semibold text-white
-        shadow-md shadow-emerald-950/20
+        bg-emerald-700 px-4 py-3 font-semibold text-white
+        shadow-md shadow-emerald-950/20 cursor-pointer
 
         transition-all duration-200 ease-out
 
@@ -51,11 +48,10 @@ import { LucideDynamicIcon, LucideIcon } from '@lucide/angular';
       <span class="min-w-0 wrap-break-word text-left text-base tracking-wide">
         {{ labelKey() | translate }}
       </span>
-    </a>
+    </button>
   `,
 })
 export class Button {
   readonly labelKey = input<string>('');
-  readonly route = input.required<string>();
   readonly icon = input.required<LucideIcon>();
 }
