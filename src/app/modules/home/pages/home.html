@@ -5,8 +5,17 @@
       <app-button
         [labelKey]="option.label"
         [icon]="option.icon"
-        [route]="option.route"
+        (click)="handle(option)"
       />
     }
   </div>
 </div>
+
+@if (showChallengeSelector()) {
+  <div
+    class="fixed inset-0 z-40 bg-black/50"
+    (click)="closeChallengeSelector()"
+  ></div>
+
+    <app-difficulty-selector />
+}
