@@ -11,7 +11,7 @@ export const routes: Routes = [
                 loadComponent: () => import('./modules/home/pages/home').then(m => m.Home)
             },
             {
-                path: 'challenges',
+                path: 'calendar',
                 loadComponent: () => import('./modules/challenges/pages/challenge-list/challenge-list').then(m => m.ChallengeList)
             },
             {

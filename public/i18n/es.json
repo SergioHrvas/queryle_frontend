@@ -1,0 +1,11 @@
+{
+  "app": {
+    "title": "Queryle",
+    "subtitle": "El SQL Wordle definitivo."
+  },
+  "home": {
+    "today": "Reto del día",
+    "calendar": "Calendario",
+    "stats": "Estadísticas"
+  }
+}

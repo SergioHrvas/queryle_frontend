@@ -1,11 +1,12 @@
 import { Component } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
+import { TranslatePipe } from "@ngx-translate/core";
 
 @Component({
     selector: "app-main-layout",
     templateUrl: "./main-layout.html",
     styleUrls: ["./main-layout.css"],
-    imports: [RouterOutlet]
+    imports: [RouterOutlet, TranslatePipe]
 })
 export class MainLayout {
 
