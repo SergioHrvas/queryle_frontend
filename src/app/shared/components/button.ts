@@ -9,14 +9,20 @@ import { LucideDynamicIcon, LucideIcon } from '@lucide/angular';
     <button
       [class]="buttonClasses()"
     >
-      @if (icon(); as buttonIcon) {
-        <span class="button-icon flex h-10 w-10 items-center justify-center rounded-lg p-1.5 transition-colors duration-200">
-          <svg [lucideIcon]="buttonIcon" size="20" class="shrink-0"></svg>
-        </span>
-      }
+      <span
+        class="inline-flex items-center gap-4"
+        [class.justify-center]="centerContent()"
+        [class.justify-start]="!centerContent()"
+      >
+        @if (icon(); as buttonIcon) {
+          <span class="button-icon flex items-center justify-center rounded-lg transition-colors duration-200">
+            <svg [lucideIcon]="buttonIcon" size="20" class="shrink-0"></svg>
+          </span>
+        }
 
-      <span [class.text-left]="icon()" class="min-w-0 text-base tracking-wide">
-        {{ labelKey() | translate }}
+        <span class="text-base tracking-wide">
+          {{ labelKey() | translate }}
+        </span>
       </span>
     </button>
   `,
@@ -24,10 +30,12 @@ import { LucideDynamicIcon, LucideIcon } from '@lucide/angular';
 export class Button {
   readonly labelKey = input<string>('');
   readonly icon = input<LucideIcon>();
+  readonly centerContent = input(false);
 
   protected readonly buttonClasses = computed(() => {
     return `
-      group box-border ${this.icon() ? 'grid grid-cols-[2.5rem_minmax(0,1fr)]' : 'flex justify-center text-center'}
+      group box-border flex ${this.centerContent() ? 'justify-center' : 'justify-start'}
+      ${this.centerContent() ? 'text-center' : 'text-left'}
       w-full min-w-0 items-center gap-3 rounded-xl border border-[var(--button-border)]
       bg-[var(--button-background)] px-4 py-3 font-semibold text-white
       shadow-md shadow-[var(--button-shadow)] cursor-pointer transition-all duration-200 ease-out

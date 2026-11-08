@@ -13,7 +13,12 @@
     "easy": "Fácil",
     "medium": "Medio",
     "hard": "Difícil",
-    "empty": "No hay retos disponibles"
+    "empty": "No hay retos disponibles",
+    "status": {
+      "notStarted": "Sin empezar",
+      "inProgress": "En curso",
+      "completed": "Completado"
+    }
   },
   "common": {
     "loading": "Cargando...",

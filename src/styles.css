@@ -15,5 +15,34 @@ app-button {
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: center;
+}
+
+.difficulty-button--easy {
+  --button-border: rgba(22, 163, 74, 0.5);
+  --button-background: #15803d;
+  --button-hover-border: #22c55e;
+  --button-hover-background: #16a34a;
+  --button-ring: #4ade80;
+}
+
+.difficulty-button--medium {
+  --button-border: rgba(217, 119, 6, 0.5);
+  --button-background: #b45309;
+  --button-hover-border: #f59e0b;
+  --button-hover-background: #d97706;
+  --button-ring: #fbbf24;
+}
+
+.difficulty-button--hard {
+  --button-border: rgba(220, 38, 38, 0.5);
+  --button-background: #b91c1c;
+  --button-hover-border: #ef4444;
+  --button-hover-background: #dc2626;
+  --button-ring: #f87171;
+}
+
+.difficulty-button--easy,
+.difficulty-button--medium,
+.difficulty-button--hard {
+  background-color: var(--button-background);
 }

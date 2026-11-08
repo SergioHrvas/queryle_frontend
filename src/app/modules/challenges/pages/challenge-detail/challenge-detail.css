@@ -1,0 +1,15 @@
+.data-context-details > summary {
+  list-style: none;
+}
+
+.data-context-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.data-context-chevron {
+  transition: transform 150ms ease;
+}
+
+.data-context-details[open] .data-context-chevron {
+  transform: rotate(180deg);
+}
