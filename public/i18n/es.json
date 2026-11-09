@@ -64,5 +64,22 @@
       }
     },
     "empty": "Todavía no has enviado ningún intento."
+  },
+  "challenge": {
+    "query": {
+      "label": "Consulta SQL",
+      "placeholder": "Escribe tu consulta SQL aquí...",
+      "submit": "Enviar",
+      "submitting": "Enviando..."
+    },
+    "data": {
+      "title": "Datos",
+      "primaryKey": "Clave primaria",
+      "unknownType": "Tipo no disponible",
+      "nullable": "Admite nulos",
+      "notNullable": "No admite nulos",
+      "emptyRows": "No hay registros disponibles.",
+      "empty": "No hay datos disponibles."
+    }
   }
 }

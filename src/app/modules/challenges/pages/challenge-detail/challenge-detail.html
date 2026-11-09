@@ -1,98 +1,34 @@
 <div class="flex flex-col gap-4 p-4">
-  <h1 class="text-xl font-bold">{{ challenge()?.formulation }}</h1>
-  @if (challenge(); as currentChallenge) {
-    <div class="flex items-center gap-5">
-      <app-difficulty-badge [difficulty]="currentChallenge.difficulty" />
-      <div class="flex items-center gap-2">
-        <svg lucideCalendar></svg>
-        <span class="date-capitalize">{{ challenge()?.publicationDate | date:'fullDate' }}</span>
-      </div>
-    </div>
+  @switch (state()) {
+    @case ('loading') {
+      <p>{{ 'common.loading' | translate }}</p>
+    }
+    @case ('error') {
+      <p class="text-red-600">{{ 'common.error' | translate }}</p>
+    }
+    @case ('loaded') {
+      @if (challenge(); as currentChallenge) {
+        <app-challenge-header [challenge]="currentChallenge" />
 
-    <div class="overflow-hidden rounded-xl border border-gray-300">
-      <div class="bg-emerald-500 p-2 text-center text-xl font-bold">
-        {{ currentChallenge.dataContext.name }}
-      </div>
-      <p class="bg-emerald-300 p-2 text-justify text-gray-800">
-        {{ currentChallenge.dataContext.description }}
-      </p>
-      <app-attempts-list [attempts]="currentChallenge.game?.attempts ?? []" />
+        <section class="overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50">
+          <div class="bg-emerald-700 p-3 text-center text-xl font-bold text-white">
+            {{ currentChallenge.dataContext.name }}
+          </div>
+          <p class="p-3 text-justify text-gray-700">
+            {{ currentChallenge.dataContext.description }}
+          </p>
 
-      <form class="flex flex-col gap-3 p-3" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <label for="query" class="font-bold">Consulta SQL</label>
-        <textarea
-          id="query"
-          formControlName="query"
-          rows="5"
-          class="w-full rounded border border-gray-300 p-2 bg-white"
-          placeholder="Escribe tu consulta SQL aquí..."
-        ></textarea>
-        <button
-          type="submit"
-          class="rounded bg-emerald-500 px-4 py-2 font-bold text-white cursor-pointer hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-gray-400"
-          [disabled]="form.invalid || isSubmitting()"
-        >
-          {{ isSubmitting() ? 'Enviando...' : 'Enviar' }}
-        </button>
-      </form>
-      <details class="data-context-details">
-        <summary class="flex cursor-pointer items-center justify-between bg-emerald-100 p-3 font-bold">
-          <span>Datos</span>
-          <svg lucideChevronDown class="data-context-chevron size-5"></svg>
-        </summary>
-        <section class="flex flex-col gap-3 p-3">
-          @for (item of currentChallenge.dataContext.dataset.tables; track $index) {
-            @let schemaTable = currentChallenge.dataContext.schema.tables.find(
-              (table) => table.name === item.name
-            );
-            <div class="overflow-x-auto rounded-xl border border-emerald-600">
-              <table class="w-full min-w-max border-collapse text-left">
-                <caption class="bg-emerald-500 p-2 text-left font-bold">
-                  {{ item.name }}
-                </caption>
-                <thead class="bg-emerald-100">
-                  <tr>
-                    @for (column of item.columns; track $index) {
-                      @let schemaColumn = schemaTable?.columns?.[$index];
-                      <th class="border border-gray-300 px-3 py-2">
-                        <span class="flex items-center gap-1">
-                          @if (schemaColumn?.primaryKey) {
-                            <svg lucideKey class="size-3" aria-label="Primary key"></svg>
-                          }
-                          {{ column }}
-                        </span>
-                        <span class="block text-xs font-normal">
-                          {{ schemaColumn?.type ?? 'Tipo no disponible' }}
-                        </span>
-                        <span class="block text-xs font-normal">
-                          {{ schemaColumn?.nullable ? 'Nullable' : 'Not null' }}
-                        </span>
-                      </th>
-                    }
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (row of item.rows; track $index) {
-                    <tr class="even:bg-gray-50">
-                      @for (value of row; track $index) {
-                        <td class="border border-gray-300 px-3 py-2">{{ value }}</td>
-                      }
-                    </tr>
-                  } @empty {
-                    <tr>
-                      <td class="px-3 py-2 text-gray-500" [attr.colspan]="item.columns.length">
-                        No hay registros disponibles.
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          } @empty {
-            <p class="text-gray-500">No hay datos disponibles.</p>
-          }
+          <app-data-context [dataContext]="currentChallenge.dataContext" />
+          <div class="border-t border-emerald-200 bg-white shadow-sm">
+            <app-challenge-query-form
+              [form]="form"
+              [isSubmitting]="isSubmitting()"
+              (submitted)="onSubmit()"
+            />
+          </div>
+          <app-attempts-list [attempts]="currentChallenge.game?.attempts ?? []" />
         </section>
-      </details>
-    </div>
+      }
+    }
   }
 </div>

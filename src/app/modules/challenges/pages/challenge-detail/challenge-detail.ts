@@ -1,15 +1,16 @@
 import { Component, inject, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { DatePipe } from "@angular/common";
 import { DailyChallenge } from "@modules/challenges/models/challenge";
 import { DailyChallengeService } from "@modules/challenges/services/daily-challenge.service";
-import { LucideCalendar, LucideChevronDown, LucideKey } from "@lucide/angular";
-import { DifficultyBadge } from "@modules/challenges/components/difficulty-badge";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { AttemptsList } from "@modules/challenges/pages/challenge-detail/components/attempts-list";
+import { ChallengeHeader } from "@modules/challenges/pages/challenge-detail/components/challenge-header";
+import { ChallengeQueryForm } from "@modules/challenges/pages/challenge-detail/components/challenge-query-form";
+import { DataContext } from "@modules/challenges/pages/challenge-detail/components/data-context";
+import { TranslatePipe } from "@ngx-translate/core";
 @Component({
     selector: 'challenge-detail',
-    imports: [ReactiveFormsModule, DatePipe, LucideCalendar, LucideChevronDown, LucideKey, DifficultyBadge, AttemptsList],
+    imports: [ReactiveFormsModule, AttemptsList, ChallengeHeader, ChallengeQueryForm, DataContext, TranslatePipe],
     templateUrl: './challenge-detail.html',
     styleUrls: ['./challenge-detail.css']
 })

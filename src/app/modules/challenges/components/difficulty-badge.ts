@@ -10,10 +10,9 @@ import { ChallengeDifficulty } from '@modules/challenges/models/challenge';
   selector: 'app-difficulty-badge',
   imports: [LucideDynamicIcon, TranslatePipe],
   template: `
-    <span
-      class="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-(--button-background) px-3 py-2 font-semibold text-white"
-      [class]="option().className"
-    >
+  <span
+    [class]="'inline-flex items-center gap-2 rounded-xl border border-white bg-(--button-background) px-3 py-2 font-semibold text-white ' + option().className"
+  >
       <svg [lucideIcon]="option().icon" size="20"></svg>
       <span>{{ option().labelKey | translate }}</span>
     </span>
