@@ -23,5 +23,46 @@
   "common": {
     "loading": "Cargando...",
     "error": "No se han podido cargar los retos"
+  },
+  "attempts": {
+    "title": "Intentos anteriores",
+    "legend": {
+      "label": "Leyenda de resultados",
+      "exact": "Exacto",
+      "partial": "Parcial",
+      "none": "Sin coincidencia"
+    },
+    "tableCaption": "Resultados de los intentos enviados",
+    "headers": {
+      "query": "Consulta SQL",
+      "columnsCount": "Nº Columnas",
+      "columnsNames": "Nombres",
+      "rowsCount": "Nº Filas",
+      "rowsData": "Datos",
+      "rowsOrder": "Orden"
+    },
+    "help": {
+      "columns": {
+        "title": "Columnas",
+        "description": "Comprueba si el número de columnas es correcto."
+      },
+      "names": {
+        "title": "Nombres",
+        "description": "Comprueba si los nombres de las columnas coinciden."
+      },
+      "rows": {
+        "title": "Filas",
+        "description": "Comprueba si el número de filas es correcto."
+      },
+      "data": {
+        "title": "Datos",
+        "description": "Comprueba si los datos de las filas coinciden."
+      },
+      "order": {
+        "title": "Orden",
+        "description": "Comprueba si el orden de las filas coincide."
+      }
+    },
+    "empty": "Todavía no has enviado ningún intento."
   }
 }

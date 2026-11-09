@@ -1,25 +1,27 @@
 import { DatePipe } from "@angular/common";
 import { Component, input } from "@angular/core";
 import { Attempt } from "@modules/challenges/models/game";
+import { ColumnHelp } from "./column-help";
+import { TranslatePipe } from "@ngx-translate/core";
 
 @Component({
     selector: 'app-attempts-list',
-    imports: [DatePipe],
+    imports: [DatePipe, ColumnHelp, TranslatePipe],
     template: `
         <section class="border-t border-gray-200 bg-gray-50 p-3" aria-labelledby="attempts-title">
             <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <h2 id="attempts-title" class="font-bold text-gray-800">Intentos anteriores</h2>
-                <div class="flex gap-3 text-xs text-gray-600" aria-label="Leyenda de resultados">
-                    <span>🟩 Exacto</span>
-                    <span>🟨 Parcial</span>
-                    <span>🟥 Sin coincidencia</span>
+                <h2 id="attempts-title" class="font-bold text-gray-800">{{ 'attempts.title' | translate }}</h2>
+                <div class="flex gap-3 text-xs text-gray-600" [attr.aria-label]="'attempts.legend.label' | translate">
+                    <span>🟩 {{ 'attempts.legend.exact' | translate }}</span>
+                    <span>🟨 {{ 'attempts.legend.partial' | translate }}</span>
+                    <span>🟥 {{ 'attempts.legend.none' | translate }}</span>
                 </div>
             </div>
 
             @if (attempts().length) {
                 <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
                     <table class="w-full min-w-190 table-fixed border-collapse text-left text-sm">
-                        <caption class="sr-only">Resultados de los intentos enviados</caption>
+                        <caption class="sr-only">{{ 'attempts.tableCaption' | translate }}</caption>
                         <colgroup>
                             <col class="w-2/5" />
                             <col class="w-[12%]" />
@@ -30,12 +32,53 @@ import { Attempt } from "@modules/challenges/models/game";
                         </colgroup>
                         <thead class="bg-emerald-100 text-xs uppercase text-gray-700">
                             <tr>
-                                <th scope="col" class="px-3 py-2">Consulta SQL</th>
-                                <th scope="col" class="w-24 whitespace-nowrap px-3 py-2 text-center">Columnas</th>
-                                <th scope="col" class="w-24 whitespace-nowrap px-3 py-2 text-center">Nombres</th>
-                                <th scope="col" class="w-24 whitespace-nowrap px-3 py-2 text-center">Filas</th>
-                                <th scope="col" class="w-24 whitespace-nowrap px-3 py-2 text-center">Datos</th>
-                                <th scope="col" class="w-24 whitespace-nowrap px-3 py-2 text-center">Orden</th>
+                                <th scope="col" class="px-3 py-2">{{ 'attempts.headers.query' | translate }}</th>
+                                <th scope="col" class="relative w-24 whitespace-nowrap px-3 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <span>{{ 'attempts.headers.columnsCount' | translate }}</span>
+                                        <app-column-help
+                                            titleKey="attempts.help.columns.title"
+                                            descriptionKey="attempts.help.columns.description"
+                                        />
+                                    </div>
+                                </th>
+                                <th scope="col" class="relative w-24 whitespace-nowrap px-3 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <span>{{ 'attempts.headers.columnsNames' | translate }}</span>
+                                        <app-column-help
+                                            titleKey="attempts.help.names.title"
+                                            descriptionKey="attempts.help.names.description"
+                                        />
+                                    </div>
+                                </th>
+                                <th scope="col" class="relative w-24 whitespace-nowrap px-3 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <span>{{ 'attempts.headers.rowsCount' | translate }}</span>
+                                        <app-column-help
+                                            titleKey="attempts.help.rows.title"
+                                            descriptionKey="attempts.help.rows.description"
+                                        />
+                                    </div>
+                                </th>
+                                <th scope="col" class="relative w-24 whitespace-nowrap px-3 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <span>{{ 'attempts.headers.rowsData' | translate }}</span>
+                                        <app-column-help
+                                            titleKey="attempts.help.data.title"
+                                            descriptionKey="attempts.help.data.description"
+                                        />
+                                    </div>
+                                </th>
+                                <th scope="col" class="relative w-24 whitespace-nowrap px-3 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <span>{{ 'attempts.headers.rowsOrder' | translate }}</span>
+                                        <app-column-help
+                                            titleKey="attempts.help.order.title"
+                                            descriptionKey="attempts.help.order.description"
+                                            align="right"
+                                        />
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,7 +116,7 @@ import { Attempt } from "@modules/challenges/models/game";
                 </div>
             } @else {
                 <p class="rounded-lg border border-dashed border-gray-300 bg-white p-4 text-center text-sm text-gray-500">
-                    Todavía no has enviado ningún intento.
+                    {{ 'attempts.empty' | translate }}
                 </p>
             }
         </section>
