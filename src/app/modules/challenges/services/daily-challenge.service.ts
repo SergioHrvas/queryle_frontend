@@ -20,10 +20,22 @@ export class DailyChallengeService {
       }
     );
   }
-
+  
   getChallengeById(id: string): Observable<DailyChallenge> {
     return this.http.get<DailyChallenge>(
       `${environment.apiUrl}/dailychallenges/${id}`,
+      {
+        headers: {
+          'X-Player-Id': 'f6c8a9bc-f8b1-460a-aaec-e7440f99c1d3',
+        },
+      }
+    );
+  }
+
+  submitAttempt(challengeId: string, query: string): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiUrl}/dailychallenges/${challengeId}/attempts`,
+      { query },
       {
         headers: {
           'X-Player-Id': 'f6c8a9bc-f8b1-460a-aaec-e7440f99c1d3',

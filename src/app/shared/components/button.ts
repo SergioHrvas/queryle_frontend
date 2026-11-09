@@ -6,9 +6,7 @@ import { LucideDynamicIcon, LucideIcon } from '@lucide/angular';
   selector: 'app-button',
   imports: [TranslatePipe, LucideDynamicIcon],
   template: `
-    <button
-      [class]="buttonClasses()"
-    >
+    <button [class]="buttonClasses()">
       <span
         class="inline-flex items-center gap-4"
         [class.justify-center]="centerContent()"

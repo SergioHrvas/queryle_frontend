@@ -40,9 +40,3 @@ app-button {
   --button-hover-background: #dc2626;
   --button-ring: #f87171;
 }
-
-.difficulty-button--easy,
-.difficulty-button--medium,
-.difficulty-button--hard {
-  background-color: var(--button-background);
-}

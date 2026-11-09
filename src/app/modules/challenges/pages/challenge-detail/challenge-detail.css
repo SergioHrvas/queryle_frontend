@@ -13,3 +13,7 @@
 .data-context-details[open] .data-context-chevron {
   transform: rotate(180deg);
 }
+
+.date-capitalize::first-letter {
+  text-transform: uppercase;
+}

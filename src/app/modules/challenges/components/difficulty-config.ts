@@ -16,19 +16,19 @@ export type DifficultyOption = {
 export const DIFFICULTY_OPTIONS: DifficultyOption[] = [
   {
     labelKey: 'difficulties.easy',
-    difficulty: 'EASY',
+    difficulty: ChallengeDifficulty.EASY,
     className: 'difficulty-button--easy',
     icon: LucideFaceSlightlySmiling,
   },
   {
     labelKey: 'difficulties.medium',
-    difficulty: 'MEDIUM',
+    difficulty: ChallengeDifficulty.MEDIUM,
     className: 'difficulty-button--medium',
     icon: LucideFaceNeutral,
   },
   {
     labelKey: 'difficulties.hard',
-    difficulty: 'HARD',
+    difficulty: ChallengeDifficulty.HARD,
     className: 'difficulty-button--hard',
     icon: LucideFaceSlightlyFrowning,
   },

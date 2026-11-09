@@ -1,7 +1,11 @@
 import { DataContext } from "@modules/challenges/models/datacontext";
 import { Game } from "@modules/challenges/models/game";
 
-export type ChallengeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
+export enum ChallengeDifficulty {
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD'
+}
 
 export interface DailyChallengeBase {
   id: string;
