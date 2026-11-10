@@ -15,9 +15,11 @@
     "hard": "Difícil",
     "empty": "No hay retos disponibles",
     "status": {
+      "label": "Estado",
       "notStarted": "Sin empezar",
       "inProgress": "En curso",
-      "completed": "Completado"
+      "failed": "Fallido",
+      "won": "Ganado"
     }
   },
   "common": {

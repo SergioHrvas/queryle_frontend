@@ -7,10 +7,24 @@ export enum ChallengeDifficulty {
   HARD = 'HARD'
 }
 
+export type ChallengeStatus =
+  | 'IN_PROGRESS'
+  | 'COMPLETED_FAILED'
+  | 'COMPLETED_WON'
+  | 'PENDING';
+
 export interface DailyChallengeBase {
   id: string;
   difficulty: ChallengeDifficulty;
   game?: Game;
+}
+
+export interface DailyChallengeSummary {
+  id: string;
+  difficulty: ChallengeDifficulty;
+  formulation: string;
+  publicationDate: string;
+  status: ChallengeStatus;
 }
 
 export interface DailyChallenge extends DailyChallengeBase {

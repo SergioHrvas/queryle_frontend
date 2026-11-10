@@ -2,12 +2,12 @@ import { Component, DestroyRef, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Button } from '@shared/components/button';
-import { ChallengeDifficulty, DailyChallengeBase } from '@modules/challenges/models/challenge';
-import { DailyChallengeService } from '@modules/challenges/services/daily-challenge.service';
 import {
-  DIFFICULTY_OPTIONS,
-  DifficultyOption,
-} from '@modules/challenges/components/difficulty-config';
+  ChallengeDifficulty,
+  DailyChallengeSummary,
+} from '@modules/challenges/models/challenge';
+import { DailyChallengeService } from '@modules/challenges/services/daily-challenge.service';
+import { DIFFICULTY_OPTIONS, DifficultyOption } from '@modules/challenges/components/difficulty-config';
 
 @Component({
   selector: 'app-difficulty-selector',
@@ -62,29 +62,14 @@ import {
       </div>
     </section>
   `,
-  styles: `
-    .challenge-status--not-started {
-      --button-border: rgba(100, 116, 139, 0.7);
-    }
-
-    .challenge-status--in-progress {
-      --button-border: rgba(245, 158, 11, 0.9);
-      --button-ring: #fbbf24;
-    }
-
-    .challenge-status--completed {
-      --button-border: rgba(52, 211, 153, 0.9);
-      --button-ring: #6ee7b7;
-    }
-  `,
 })
 export class DifficultySelector {
   private readonly dailyChallengeService = inject(DailyChallengeService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly state = signal<FetchState>('loading');
-  protected readonly challenges = signal<DailyChallengeBase[]>([]);
-  readonly selected = output<DailyChallengeBase>();
+  protected readonly challenges = signal<DailyChallengeSummary[]>([]);
+  readonly selected = output<DailyChallengeSummary>();
 
   protected readonly difficultyOptions: DifficultyOption[] = DIFFICULTY_OPTIONS;
 
@@ -101,41 +86,54 @@ export class DifficultySelector {
       });
   }
 
-  protected challengeFor(difficulty: ChallengeDifficulty): DailyChallengeBase | undefined {
+  protected challengeFor(difficulty: ChallengeDifficulty): DailyChallengeSummary | undefined {
     return this.challenges().find((challenge) => challenge.difficulty === difficulty);
   }
 
-  protected statusLabelKey(challenge: DailyChallengeBase): string {
-    if (!challenge.game) {
-      return 'difficulties.status.notStarted';
+  protected statusLabelKey(challenge: DailyChallengeSummary): string {
+    switch (challenge.status) {
+      case 'PENDING':
+        return 'difficulties.status.notStarted';
+      case 'IN_PROGRESS':
+        return 'difficulties.status.inProgress';
+      case 'COMPLETED_FAILED':
+        return 'difficulties.status.failed';
+      case 'COMPLETED_WON':
+        return 'difficulties.status.won';
+      default:
+        return 'difficulties.status.notStarted';
     }
-
-    return challenge.game.status === 'IN_PROGRESS'
-      ? 'difficulties.status.inProgress'
-      : 'difficulties.status.completed';
   }
 
-  protected statusClass(challenge: DailyChallengeBase): string {
-    if (!challenge.game) {
-      return 'challenge-status--not-started';
+  protected statusClass(challenge: DailyChallengeSummary): string {
+    if (challenge.status === 'PENDING') {
+      return 'challenge-status--pending';
     }
 
-    return challenge.game.status === 'IN_PROGRESS'
-      ? 'challenge-status--in-progress'
-      : 'challenge-status--completed';
-  }
-
-  protected statusTextClass(challenge: DailyChallengeBase): string {
-    if (!challenge.game) {
-      return 'text-slate-400';
+    if (challenge.status === 'IN_PROGRESS') {
+      return 'challenge-status--in-progress';
     }
 
-    return challenge.game.status === 'IN_PROGRESS'
-      ? 'text-amber-300'
-      : 'text-emerald-300';
+    return challenge.status === 'COMPLETED_FAILED'
+      ? 'challenge-status--failed'
+      : 'challenge-status--won';
   }
 
-  protected select(challenge: DailyChallengeBase | undefined): void {
+  protected statusTextClass(challenge: DailyChallengeSummary): string {
+    if (challenge.status === 'PENDING') {
+      return 'challenge-status-text--pending';
+    }
+
+    if (challenge.status === 'IN_PROGRESS') {
+      return 'challenge-status-text--in-progress';
+    }
+
+    return challenge.status === 'COMPLETED_FAILED'
+      ? 'challenge-status-text--failed'
+      : 'challenge-status-text--won';
+  }
+
+  protected select(challenge: DailyChallengeSummary | undefined): void {
     if (challenge) {
       this.selected.emit(challenge);
     }

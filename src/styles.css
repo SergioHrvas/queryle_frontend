@@ -11,6 +11,61 @@ app-button {
   --button-ring: #34d399;
 }
 
+.challenge-status--pending {
+  --button-border: rgba(100, 116, 139, 0.7);
+}
+
+.challenge-status--in-progress {
+  --button-border: rgba(245, 158, 11, 0.9);
+  --button-ring: #fbbf24;
+}
+
+.challenge-status--won {
+  --button-border: rgba(52, 211, 153, 0.9);
+  --button-ring: #6ee7b7;
+}
+
+.challenge-status--failed {
+  --button-border: rgba(248, 113, 113, 0.9);
+  --button-ring: #fca5a5;
+}
+
+.challenge-status-text--pending {
+  color: #cbd5e1;
+}
+
+.challenge-status-text--in-progress {
+  color: #fcd34d;
+}
+
+.challenge-status-text--won {
+  color: #6ee7b7;
+}
+
+.challenge-status-text--failed {
+  color: #fca5a5;
+}
+
+.challenge-status-badge--pending {
+  background-color: #e2e8f0;
+  color: #1e293b;
+}
+
+.challenge-status-badge--in-progress {
+  background-color: #fbbf24;
+  color: #451a03;
+}
+
+.challenge-status-badge--won {
+  background-color: #ffffff;
+  color: #047857;
+}
+
+.challenge-status-badge--failed {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
 .main-content > router-outlet + * {
   display: flex;
   flex: 1;
