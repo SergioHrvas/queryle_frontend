@@ -29,9 +29,25 @@ export class ChallengeDetail {
     });
     protected readonly isSubmitting = signal(false);
 
+    protected readonly hasWon = () => {
+        const currentChallenge = this.challenge();
+        if (!currentChallenge) return false;
+    
+        const currentGame = currentChallenge.game;
+        if (!currentGame) return false;
+
+        if (currentGame.status !== 'COMPLETED_WON') return false;
+        
+        if(!currentGame.attempts || currentGame.attempts.length === 0) return false;
+        
+        const lastAttempt = currentGame.attempts[currentGame.attempts.length - 1];
+        return (currentGame.status === 'COMPLETED_WON') 
+                    && lastAttempt.validationPassed;
+    };
+    
+    protected readonly hasFailed = () => this.challenge()?.game?.status === 'COMPLETED_FAILED';
     protected readonly onSubmit = () => {
         if (this.form.invalid) {
-            console.log("INVALID");
             return;
         }
         this.isSubmitting.set(true);
@@ -65,7 +81,7 @@ export class ChallengeDetail {
             }
         });
     }
-    
+
     submitAttempt() {
         const query = this.form.value.query;
         if(!query || query.trim() === '') {
@@ -85,5 +101,4 @@ export class ChallengeDetail {
             }
         });
     }
-
 }

@@ -30,7 +30,8 @@
       "label": "Leyenda de resultados",
       "exact": "Exacto",
       "partial": "Parcial",
-      "none": "Sin coincidencia"
+      "none": "Sin coincidencia",
+      "trap": "Trampa"
     },
     "tableCaption": "Resultados de los intentos enviados",
     "headers": {
@@ -80,6 +81,10 @@
       "notNullable": "No admite nulos",
       "emptyRows": "No hay registros disponibles.",
       "empty": "No hay datos disponibles."
+    },
+    "completed": {
+      "won": "¡Enhorabuena! Has completado el reto.",
+      "failed": "Has agotado todos los intentos. ¡La próxima vez será!"
     }
   }
 }

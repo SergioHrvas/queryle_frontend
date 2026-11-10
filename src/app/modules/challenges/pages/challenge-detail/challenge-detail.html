@@ -20,11 +20,22 @@
 
           <app-data-context [dataContext]="currentChallenge.dataContext" />
           <div class="border-t border-emerald-200 bg-white shadow-sm">
+            @if (currentChallenge.game?.status === "IN_PROGRESS") {
             <app-challenge-query-form
               [form]="form"
               [isSubmitting]="isSubmitting()"
               (submitted)="onSubmit()"
             />
+            } @else if (hasWon()) {
+              <div class="p-4 text-center text-green-700 bg-green-100">
+                {{ 'challenge.completed.won' | translate }}
+              </div>
+            } @else if (hasFailed()) {
+              <div class="p-4 text-center text-red-700 bg-red-100">
+                {{ 'challenge.completed.failed' | translate }}
+              </div>
+
+            }
           </div>
           <app-attempts-list [attempts]="currentChallenge.game?.attempts ?? []" />
         </section>

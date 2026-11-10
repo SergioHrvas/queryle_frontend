@@ -1,6 +1,6 @@
 export interface Game {
     id: string;
-    status: 'IN_PROGRESS' | 'COMPLETED';
+    status: 'IN_PROGRESS' | 'COMPLETED_WON' | 'COMPLETED_FAILED';
     attempts: Attempt[];
 }
 
@@ -18,5 +18,6 @@ export interface Attempt {
     rowsCountMatchLevel: AttemptResult;
     rowsDataMatchLevel: AttemptResult;
     rowsOrderMatchLevel: AttemptResult;
+    validationPassed: boolean;
     submittedAt: string;
 }
