@@ -20,7 +20,7 @@
 
           <app-data-context [dataContext]="currentChallenge.dataContext" />
           <div class="border-t border-emerald-200 bg-white shadow-sm">
-            @if (currentChallenge.game?.status === "IN_PROGRESS") {
+            @if (currentChallenge.game?.status !== "COMPLETED_WON" && currentChallenge.game?.status !== "COMPLETED_FAILED") {
             <app-challenge-query-form
               [form]="form"
               [isSubmitting]="isSubmitting()"

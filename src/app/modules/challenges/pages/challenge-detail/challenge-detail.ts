@@ -1,13 +1,16 @@
 import { Component, inject, signal } from "@angular/core";
+import { HttpErrorResponse } from "@angular/common/http";
 import { ActivatedRoute } from "@angular/router";
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { TranslatePipe } from "@ngx-translate/core";
 import { DailyChallenge } from "@modules/challenges/models/challenge";
 import { DailyChallengeService } from "@modules/challenges/services/daily-challenge.service";
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { AttemptsList } from "@modules/challenges/pages/challenge-detail/components/attempts-list";
 import { ChallengeHeader } from "@modules/challenges/pages/challenge-detail/components/challenge-header";
 import { ChallengeQueryForm } from "@modules/challenges/pages/challenge-detail/components/challenge-query-form";
 import { DataContext } from "@modules/challenges/pages/challenge-detail/components/data-context";
-import { TranslatePipe } from "@ngx-translate/core";
+import { NotificationService } from "@modules/challenges/services/notification.service";
+import { TranslateService } from "@ngx-translate/core";
 @Component({
     selector: 'challenge-detail',
     imports: [ReactiveFormsModule, AttemptsList, ChallengeHeader, ChallengeQueryForm, DataContext, TranslatePipe],
@@ -16,6 +19,8 @@ import { TranslatePipe } from "@ngx-translate/core";
 })
 export class ChallengeDetail {
     private readonly dailyChallengeService = inject(DailyChallengeService);
+    private readonly notificationService = inject(NotificationService);
+    private readonly translateService = inject(TranslateService);
 
     protected readonly state = signal<FetchState>('loading');
 
@@ -64,7 +69,7 @@ export class ChallengeDetail {
         this.loadChallenge();
     }
 
-    private loadChallenge() {
+    private loadChallenge(onLoaded?: () => void) {
         if(!this.challengeId) {
             console.error('No challenge ID available.');
             this.state.set('error');
@@ -74,6 +79,7 @@ export class ChallengeDetail {
             next: (challenge) => {
                 this.challenge.set(challenge);
                 this.state.set('loaded');
+                onLoaded?.();
             },
             error: (error) => {
                 console.error('Error fetching challenge:', error);
@@ -91,14 +97,34 @@ export class ChallengeDetail {
         this.dailyChallengeService.submitAttempt(this.challengeId!, query).subscribe({
             next: () => {
                 console.log('Attempt submitted successfully.');
-                this.loadChallenge();
                 this.form.reset();
                 this.isSubmitting.set(false);
+                this.loadChallenge(() => {
+                    if (this.hasWon()) {
+                        this.notificationService.success(
+                            this.translateService.translate('challenge.success.won')()
+                        );
+                    }
+                });
             },
             error: (error) => {
                 console.error('Error submitting attempt:', error);
                 this.isSubmitting.set(false);
+                this.notificationService.error(this.getSubmissionErrorMessage(error));
             }
         });
+    }
+
+    private getSubmissionErrorMessage(error: HttpErrorResponse): string {
+        if (error.error && typeof error.error === 'object') {
+            const type = (error.error as { type?: unknown }).type;
+            if (type === 'domain-rule-violated') {
+                return this.translateService.translate('challenge.errors.invalidDataContext')();
+            } else if (type === 'invalid-query') {
+                return this.translateService.translate('challenge.errors.invalidQuery')();
+            }
+        }
+
+        return this.translateService.translate('challenge.errors.submitFailed')();
     }
 }

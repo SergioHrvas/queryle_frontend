@@ -73,6 +73,11 @@
       "submit": "Enviar",
       "submitting": "Enviando..."
     },
+    "errors": {
+      "invalidDataContext": "La consulta esperada no es válida para este contexto de datos.",
+      "invalidQuery": "La consulta enviada no es válida.",
+      "submitFailed": "No se ha podido enviar la consulta."
+    },
     "data": {
       "title": "Datos",
       "primaryKey": "Clave primaria",
@@ -83,8 +88,14 @@
       "empty": "No hay datos disponibles."
     },
     "completed": {
-      "won": "¡Enhorabuena! Has completado el reto.",
+      "won": "Has completado el reto con éxito. ¡Enhorabuena!",
       "failed": "Has agotado todos los intentos. ¡La próxima vez será!"
+    },
+    "success": {
+      "won": "¡Has ganado! Tu consulta es correcta."
     }
+  },
+  "notification": {
+    "close": "Cerrar"
   }
 }

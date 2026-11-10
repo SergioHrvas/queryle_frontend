@@ -40,3 +40,26 @@ app-button {
   --button-hover-background: #dc2626;
   --button-ring: #f87171;
 }
+
+.notification {
+  color: white;
+}
+
+.notification-info {
+  background-color: #44474d; /* Blue background for info */
+}
+
+.notification-success {
+  background-color: #10b981; /* Green background for success */
+  border: 2px solid #6ee7b7;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25), 0 8px 20px rgba(6, 95, 70, 0.35);
+  font-weight: 700;
+}
+
+.notification-error {
+  background-color: #ef4444; /* Red background for error */
+}
+
+.notification-warning {
+  background-color: #f59e0b; /* Yellow background for warning */
+}

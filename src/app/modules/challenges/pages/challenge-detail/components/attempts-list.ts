@@ -100,7 +100,7 @@ import { LucideShieldX } from '@lucide/angular';
                   <td class="max-w-70 px-3 py-3 font-mono text-xs text-gray-700">
                     <div class="flex flex-row items-center justify-between gap-2">
                       <div class="flex min-w-0 flex-1 flex-col">
-                        <span class="block whitespace-normal break-words" [title]="attempt.query">
+                        <span class="block whitespace-normal wrap-break-words" [title]="attempt.query">
                           {{ attempt.query }}
                         </span>
                         <span class="block text-xs text-gray-500">

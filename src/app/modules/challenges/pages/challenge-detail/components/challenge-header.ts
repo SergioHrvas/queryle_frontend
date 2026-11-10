@@ -24,7 +24,6 @@ import { DailyChallenge } from "@modules/challenges/models/challenge";
             </div>
         </header>
     `,
-    styleUrls: ["../challenge-detail.css"],
 })
 export class ChallengeHeader {
     readonly challenge = input.required<DailyChallenge>();
