@@ -15,7 +15,6 @@ import { TranslateService } from "@ngx-translate/core";
     selector: 'challenge-detail',
     imports: [ReactiveFormsModule, AttemptsList, ChallengeHeader, ChallengeQueryForm, DataContext, TranslatePipe],
     templateUrl: './challenge-detail.html',
-    styleUrls: ['./challenge-detail.css']
 })
 export class ChallengeDetail {
     private readonly dailyChallengeService = inject(DailyChallengeService);

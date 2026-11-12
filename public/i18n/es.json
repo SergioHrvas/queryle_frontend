@@ -26,6 +26,25 @@
     "loading": "Cargando...",
     "error": "No se han podido cargar los retos"
   },
+  "calendar": {
+    "weekdays": {
+      "monday": "Lun",
+      "tuesday": "Mar",
+      "wednesday": "Mié",
+      "thursday": "Jue",
+      "friday": "Vie",
+      "saturday": "Sáb",
+      "sunday": "Dom"
+    },
+    "dailyChallenge": "Retos diarios",
+    "difficulty": {
+      "label": "Dificultad",
+      "select": "Selecciona la dificultad",
+      "easy": "Fácil",
+      "medium": "Medio",
+      "hard": "Difícil"
+    }
+  },
   "attempts": {
     "title": "Intentos anteriores",
     "legend": {

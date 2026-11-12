@@ -7,10 +7,10 @@ import { TranslatePipe } from "@ngx-translate/core";
     selector: "app-data-context",
     imports: [LucideChevronDown, LucideKey, TranslatePipe],
     template: `
-        <details class="data-context-details border-t border-emerald-200">
-            <summary class="flex cursor-pointer items-center justify-between bg-emerald-100 p-3 font-bold text-emerald-900 hover:bg-emerald-200">
+        <details class="group border-t border-emerald-200">
+            <summary class="list-none flex cursor-pointer items-center justify-between bg-emerald-100 p-3 font-bold text-emerald-900 hover:bg-emerald-200 [&::-webkit-details-marker]:hidden">
                 <span>{{ 'challenge.data.title' | translate }}</span>
-                <svg lucideChevronDown class="data-context-chevron size-5"></svg>
+                <svg lucideChevronDown class="size-5 transition-transform duration-150 group-open:rotate-180"></svg>
             </summary>
             <section class="flex flex-col gap-3 p-3">
                 @for (item of dataContext().dataset.tables; track item.name) {
@@ -64,7 +64,6 @@ import { TranslatePipe } from "@ngx-translate/core";
             </section>
         </details>
     `,
-    styleUrls: ["../challenge-detail.css"],
 })
 export class DataContext {
     readonly dataContext = input.required<ChallengeDataContext>();

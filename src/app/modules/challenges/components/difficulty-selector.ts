@@ -1,17 +1,17 @@
 import { Component, DestroyRef, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Button } from '@shared/components/button';
 import {
   ChallengeDifficulty,
   DailyChallengeSummary,
 } from '@modules/challenges/models/challenge';
 import { DailyChallengeService } from '@modules/challenges/services/daily-challenge.service';
 import { DIFFICULTY_OPTIONS, DifficultyOption } from '@modules/challenges/components/difficulty-config';
+import { DifficultyTabs } from '@modules/challenges/components/difficulty-tabs';
 
 @Component({
   selector: 'app-difficulty-selector',
-  imports: [Button, TranslatePipe],
+  imports: [DifficultyTabs, TranslatePipe],
   template: `
     <section
       class="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl bg-slate-900 p-4 shadow-xl sm:p-6"
@@ -36,26 +36,20 @@ import { DIFFICULTY_OPTIONS, DifficultyOption } from '@modules/challenges/compon
             <p class="text-sm text-slate-300">{{ 'difficulties.empty' | translate }}</p>
           }
           @case ('loaded') {
-            <div class="grid w-full grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4">
-              @for (option of difficultyOptions; track option.difficulty) {
-                @if (challengeFor(option.difficulty); as challenge) {
-                  <div class="flex w-full flex-col gap-1">
-                    <app-button
-                      [labelKey]="option.labelKey"
-                      [icon]="option.icon"
-                      [centerContent]="true"
-                      [class]="option.className + ' ' + statusClass(challenge)"
-                      (click)="select(challenge)"
-                    />
+            <div class="flex w-full flex-col gap-2">
+              <app-difficulty-tabs (changed)="selectDifficulty($event)" />
+              <div class="grid grid-cols-3 gap-2">
+                @for (option of difficultyOptions; track option.difficulty) {
+                  @if (challengeFor(option.difficulty); as challenge) {
                     <span
                       class="text-center text-xs font-medium"
                       [class]="statusTextClass(challenge)"
                     >
                       {{ statusLabelKey(challenge) | translate }}
                     </span>
-                  </div>
+                  }
                 }
-              }
+              </div>
             </div>
           }
         }
@@ -137,5 +131,9 @@ export class DifficultySelector {
     if (challenge) {
       this.selected.emit(challenge);
     }
+  }
+
+  protected selectDifficulty(difficulty: ChallengeDifficulty): void {
+    this.select(this.challengeFor(difficulty));
   }
 }
