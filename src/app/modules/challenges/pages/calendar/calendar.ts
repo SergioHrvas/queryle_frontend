@@ -1,5 +1,6 @@
 import { LOCALE_ID, Component, computed, inject, signal } from "@angular/core";
 import { DatePipe, NgClass } from "@angular/common";
+import { Router } from "@angular/router";
 import { DailyChallengeService } from "@modules/challenges/services/daily-challenge.service";
 import {
     ChallengeDifficulty,
@@ -42,6 +43,7 @@ type LocaleWithWeekInfo = Intl.Locale & {
 })
 export class Calendar {
     private readonly dailyChallengeService = inject(DailyChallengeService);
+    private readonly router = inject(Router);
     private readonly locale = inject(LOCALE_ID);
 
     protected readonly currentDate = signal(new Date());
@@ -85,6 +87,14 @@ export class Calendar {
     protected changeDifficulty(newDifficulty: ChallengeDifficulty): void {
         this.difficulty.set(newDifficulty);
         this.loadChallengesForMonth(this.currentDate());
+    }
+
+    protected openChallenge(challenge?: CalendarChallenge): void {
+        if (!challenge) {
+            return;
+        }
+
+        this.router.navigate(['/challenge', challenge.id]);
     }
     
     private generateCalendarDays(date: Date): CalendarDay[] {

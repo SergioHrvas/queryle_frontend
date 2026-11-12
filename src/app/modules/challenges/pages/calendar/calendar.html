@@ -76,7 +76,12 @@
           [class.hover:-translate-y-0.5]="day.challenge"
           [style.background-color]="day.challenge ? statusBackground(day.challenge.status) : null"
           [style.color]="day.challenge ? statusTextColor(day.challenge.status) : null"
+          [attr.tabindex]="day.challenge ? 0 : -1"
+          [attr.aria-disabled]="!day.challenge"
           [attr.aria-label]="day.date | date: 'd MMMM y'"
+          (click)="openChallenge(day.challenge)"
+          (keydown.enter)="openChallenge(day.challenge)"
+          (keydown.space)="openChallenge(day.challenge); $event.preventDefault()"
         >
           <span
             class="inline-flex h-8 min-w-8 items-center justify-center rounded-full text-sm font-extrabold"
