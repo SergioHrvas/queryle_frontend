@@ -1,0 +1,1 @@
+type FetchState = 'loading' | 'loaded' | 'empty' | 'error';

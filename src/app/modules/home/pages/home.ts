@@ -3,7 +3,7 @@ import { Button } from '@shared/components/button';
 import { HOME_MENU_OPTIONS, HomeMenuOption } from '@modules/home/home-menu-options';
 import { Router } from '@angular/router';
 import { DifficultySelector } from '@modules/challenges/components/difficulty-selector';
-import { DailyChallenge } from '@modules/challenges/models/challenge-difficulty';
+import { DailyChallengeSummary } from '@modules/challenges/models/challenge';
 
 @Component({
   selector: 'app-home',
@@ -56,8 +56,10 @@ export class Home {
     this.showChallengeSelector.set(false);
   }
 
-  protected handleChallengeSelected(challenge: DailyChallenge): void {
+  protected handleChallengeSelected(challenge: DailyChallengeSummary): void {
     this.closeChallengeSelector();
+    this.router.navigate(['/challenge', challenge.id]);
+
     console.log(`Selected daily challenge: ${challenge.id}`);
   }
 }

@@ -1,0 +1,45 @@
+<div class="flex flex-col gap-4 p-4">
+  @switch (state()) {
+    @case ('loading') {
+      <p>{{ 'common.loading' | translate }}</p>
+    }
+    @case ('error') {
+      <p class="text-red-600">{{ 'common.error' | translate }}</p>
+    }
+    @case ('loaded') {
+      @if (challenge(); as currentChallenge) {
+        <app-challenge-header [challenge]="currentChallenge" />
+
+        <section class="overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50">
+          <div class="bg-emerald-700 p-3 text-center text-xl font-bold text-white">
+            {{ currentChallenge.dataContext.name }}
+          </div>
+          <p class="p-3 text-justify text-gray-700">
+            {{ currentChallenge.dataContext.description }}
+          </p>
+
+          <app-data-context [dataContext]="currentChallenge.dataContext" />
+          <div class="border-t border-emerald-200 bg-white shadow-sm">
+            @if (currentChallenge.game?.status !== "COMPLETED_WON" && currentChallenge.game?.status !== "COMPLETED_FAILED") {
+            <app-challenge-query-form
+              [form]="form"
+              [isSubmitting]="isSubmitting()"
+              (submitted)="onSubmit()"
+            />
+            } @else if (hasWon()) {
+              <div class="p-4 text-center text-green-700 bg-green-100">
+                {{ 'challenge.completed.won' | translate }}
+              </div>
+            } @else if (hasFailed()) {
+              <div class="p-4 text-center text-red-700 bg-red-100">
+                {{ 'challenge.completed.failed' | translate }}
+              </div>
+
+            }
+          </div>
+          <app-attempts-list [attempts]="currentChallenge.game?.attempts ?? []" />
+        </section>
+      }
+    }
+  }
+</div>
