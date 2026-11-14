@@ -12,7 +12,7 @@ export const routes: Routes = [
             },
             {
                 path: 'calendar',
-                loadComponent: () => import('./modules/challenges/pages/challenge-list/challenge-list').then(m => m.ChallengeList)
+                loadComponent: () => import('./modules/challenges/pages/calendar/calendar').then(m => m.Calendar)
             },
             {
                 path: 'challenge/:id',

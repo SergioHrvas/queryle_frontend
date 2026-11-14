@@ -29,7 +29,7 @@ import { DailyChallenge } from "@modules/challenges/models/challenge";
                 </div>
                 <div class="flex items-center gap-2">
                     <svg lucideCalendar></svg>
-                    <span class="date-capitalize">{{ challenge().publicationDate | date: 'fullDate' }}</span>
+                    <span class="capitalize">{{ challenge().publicationDate | date: 'fullDate' }}</span>
                 </div>
             </div>
         </header>
