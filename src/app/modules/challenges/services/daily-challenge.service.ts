@@ -14,9 +14,6 @@ import { environment } from '@core/environments/environment';
 export class DailyChallengeService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/dailychallenges`;
-  private readonly headers = new HttpHeaders({
-    'X-Player-Id': 'f6c8a9bc-f8b1-460a-aaec-e7440f99c1d3',
-  });
 
   getToday(): Observable<DailyChallengeSummary[]> {
     return this.getSummaries(`${this.baseUrl}/today`);
@@ -45,7 +42,6 @@ export class DailyChallengeService {
   getChallengeById(id: string): Observable<DailyChallenge> {
     return this.http.get<DailyChallenge>(
       `${this.baseUrl}/${encodeURIComponent(id)}`,
-      { headers: this.headers },
     );
   }
 
@@ -53,7 +49,6 @@ export class DailyChallengeService {
     return this.http.post<void>(
       `${this.baseUrl}/${encodeURIComponent(challengeId)}/attempts`,
       { query },
-      { headers: this.headers },
     );
   }
 
@@ -63,7 +58,6 @@ export class DailyChallengeService {
   ): Observable<DailyChallengeSummary[]> {
     return this.http
       .get<DailyChallengeSummary[]>(url, {
-        headers: this.headers,
         params,
       })
       .pipe(
