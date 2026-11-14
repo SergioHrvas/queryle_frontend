@@ -22,6 +22,9 @@ export class AuthService {
         await this.keycloak.init({
             onLoad: 'check-sso',
             pkceMethod: 'S256',
+            silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`,
+            silentCheckSsoFallback: false,
+            checkLoginIframe: false,
         });
     }
 
@@ -70,4 +73,5 @@ export class AuthService {
     get email(): string | undefined {
         return this.keycloak.tokenParsed?.['email'];
     }
+
 }

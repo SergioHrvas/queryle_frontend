@@ -5,10 +5,10 @@ import { PlayersApiService } from './players-api.service';
 import { AuthService } from './auth.service';
 
 export type PlayerSessionState =
-  | { status: 'anonymous' }
-  | { status: 'registering'; attempt: number }
+  | { status: 'unknown' }
+  | { status: 'loading'; attempt: number }
   | { status: 'ready' }
-  | { status: 'failed'; kind: 'temporary' | 'unauthorized' | 'permanent' };
+  | { status: 'error'; kind: 'temporary' | 'unauthorized' | 'permanent' };
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class PlayerSessionService {
   private readonly playersApi = inject(PlayersApiService);
 
   private readonly stateSignal = signal<PlayerSessionState>({
-    status: 'anonymous'
+    status: 'unknown'
   });
 
   private inFlight: Promise<PlayerSessionState> | null = null;
@@ -27,12 +27,12 @@ export class PlayerSessionService {
 
   ensureRegistered(): Promise<PlayerSessionState> {
     if (!this.auth.isAuthenticated) {
-      this.stateSignal.set({ status: 'anonymous' });
+      this.stateSignal.set({ status: 'unknown' });
       return Promise.resolve(this.stateSignal());
     }
 
     const currentState = this.stateSignal();
-    if (currentState.status === 'ready' || currentState.status === 'failed') {
+    if (currentState.status === 'ready' || currentState.status === 'error') {
       return Promise.resolve(this.stateSignal());
     }
 
@@ -41,7 +41,7 @@ export class PlayerSessionService {
 
   retry(): Promise<PlayerSessionState> {
     if (!this.auth.isAuthenticated) {
-      this.stateSignal.set({ status: 'anonymous' });
+      this.stateSignal.set({ status: 'unknown' });
       return Promise.resolve(this.stateSignal());
     }
 
@@ -49,7 +49,7 @@ export class PlayerSessionService {
   }
 
   reset(): void {
-    this.stateSignal.set({ status: 'anonymous' });
+    this.stateSignal.set({ status: 'unknown' });
   }
 
   invalidate(): void {
@@ -66,7 +66,7 @@ export class PlayerSessionService {
 
   private async register(): Promise<PlayerSessionState> {
     this.stateSignal.set({
-      status: 'registering',
+      status: 'loading',
       attempt: 1
     });
 
@@ -81,7 +81,7 @@ export class PlayerSessionService {
               }
 
               this.stateSignal.set({
-                status: 'registering',
+                status: 'loading',
                 attempt: retryCount + 1
               });
 
@@ -99,7 +99,7 @@ export class PlayerSessionService {
       });
     } catch (error) {
       this.stateSignal.set({
-        status: 'failed',
+        status: 'error',
         kind: this.getErrorKind(error)
       });
     }

@@ -27,8 +27,4 @@ export const routes: Routes = [
         path: 'login',
         loadComponent: () => import('./modules/auth/pages/login/login').then(m => m.Login)
     },
-    {
-        path: 'session-problem',
-        loadComponent: () => import('./core/auth/session-problem/session-problem').then(m => m.SessionProblem)
-    }
 ];
