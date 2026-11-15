@@ -37,11 +37,12 @@ import { LucideShieldX } from '@lucide/angular';
             </caption>
             <colgroup>
               <col class="w-2/5" />
-              <col class="w-[12%]" />
-              <col class="w-[12%]" />
-              <col class="w-[12%]" />
-              <col class="w-[12%]" />
-              <col class="w-[12%]" />
+              <col class="w-[10%]" />
+              <col class="w-[10%]" />
+              <col class="w-[10%]" />
+              <col class="w-[10%]" />
+              <col class="w-[10%]" />
+              <col class="w-[10%]" />
             </colgroup>
             <thead class="bg-emerald-100 text-xs uppercase text-gray-700">
               <tr>
@@ -51,7 +52,7 @@ import { LucideShieldX } from '@lucide/angular';
                     <span>{{ 'attempts.headers.columnsCount' | translate }}</span>
                     <app-column-help
                       titleKey="attempts.help.columns.title"
-                      descriptionKey="attempts.help.columns.description"
+                      descriptionKey="attempts.help.columns"
                     />
                   </div>
                 </th>
@@ -60,7 +61,17 @@ import { LucideShieldX } from '@lucide/angular';
                     <span>{{ 'attempts.headers.columnsNames' | translate }}</span>
                     <app-column-help
                       titleKey="attempts.help.names.title"
-                      descriptionKey="attempts.help.names.description"
+                      descriptionKey="attempts.help.names"
+                    />
+                  </div>
+                </th>
+                <th scope="col" class="relative w-24 whitespace-nowrap px-3 py-2 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <span>{{ 'attempts.headers.columnsOrder' | translate }}</span>
+                    <app-column-help
+                      titleKey="attempts.help.columnsOrder.title"
+                      descriptionKey="attempts.help.columnsOrder"
+                      align="right"
                     />
                   </div>
                 </th>
@@ -69,7 +80,7 @@ import { LucideShieldX } from '@lucide/angular';
                     <span>{{ 'attempts.headers.rowsCount' | translate }}</span>
                     <app-column-help
                       titleKey="attempts.help.rows.title"
-                      descriptionKey="attempts.help.rows.description"
+                      descriptionKey="attempts.help.rows"
                     />
                   </div>
                 </th>
@@ -78,7 +89,7 @@ import { LucideShieldX } from '@lucide/angular';
                     <span>{{ 'attempts.headers.rowsData' | translate }}</span>
                     <app-column-help
                       titleKey="attempts.help.data.title"
-                      descriptionKey="attempts.help.data.description"
+                      descriptionKey="attempts.help.data"
                     />
                   </div>
                 </th>
@@ -86,8 +97,8 @@ import { LucideShieldX } from '@lucide/angular';
                   <div class="flex items-center justify-center gap-1">
                     <span>{{ 'attempts.headers.rowsOrder' | translate }}</span>
                     <app-column-help
-                      titleKey="attempts.help.order.title"
-                      descriptionKey="attempts.help.order.description"
+                      titleKey="attempts.help.rowsOrder.title"
+                      descriptionKey="attempts.help.rowsOrder"
                       align="right"
                     />
                   </div>
@@ -125,6 +136,12 @@ import { LucideShieldX } from '@lucide/angular';
                     [attr.aria-label]="attempt.columnsNamesMatchLevel"
                   >
                     {{ resultIcon(attempt.columnsNamesMatchLevel) }}
+                  </td>
+                  <td
+                    class="px-3 py-3 text-center text-lg"
+                    [attr.aria-label]="attempt.columnsOrderMatchLevel"
+                  >
+                    {{ resultIcon(attempt.columnsOrderMatchLevel) }}
                   </td>
                   <td
                     class="px-3 py-3 text-center text-lg"
@@ -166,6 +183,7 @@ export class AttemptsList {
     return (
       attempt.columnsCountMatchLevel === 'EXACT' &&
       attempt.columnsNamesMatchLevel === 'EXACT' &&
+      attempt.columnsOrderMatchLevel === 'EXACT' &&
       attempt.rowsCountMatchLevel === 'EXACT' &&
       attempt.rowsDataMatchLevel === 'EXACT' &&
       attempt.rowsOrderMatchLevel === 'EXACT'

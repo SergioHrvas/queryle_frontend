@@ -15,6 +15,7 @@ export interface Attempt {
     query: string;
     columnsNamesMatchLevel: AttemptResult;
     columnsCountMatchLevel: AttemptResult;
+    columnsOrderMatchLevel: AttemptResult;
     rowsCountMatchLevel: AttemptResult;
     rowsDataMatchLevel: AttemptResult;
     rowsOrderMatchLevel: AttemptResult;
