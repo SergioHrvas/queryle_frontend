@@ -6,7 +6,7 @@ import { LucideDynamicIcon, LucideIcon } from '@lucide/angular';
   selector: 'app-button',
   imports: [TranslatePipe, LucideDynamicIcon],
   template: `
-    <button [class]="buttonClasses()">
+    <button [type]="type()" [class]="buttonClasses()">
       <span
         class="inline-flex items-center gap-4"
         [class.justify-center]="centerContent()"
@@ -29,6 +29,7 @@ export class Button {
   readonly labelKey = input<string>('');
   readonly icon = input<LucideIcon>();
   readonly centerContent = input(false);
+  readonly type = input<'button' | 'submit' | 'reset'>('submit');
 
   protected readonly buttonClasses = computed(() => {
     return `
