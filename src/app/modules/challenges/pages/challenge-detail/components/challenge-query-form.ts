@@ -1,7 +1,9 @@
-import { Component, ElementRef, input, output, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, input, output, signal, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Button } from '@shared/components/button';
+import { DataContext } from '@modules/challenges/models/datacontext';
+import { SqlAutocompleteService } from '@modules/challenges/services/sql-autocomplete.service';
 
 type QueryForm = FormGroup<{
   query: FormControl<string>;
@@ -53,6 +55,14 @@ type QueryForm = FormGroup<{
           [labelKey]="'challenge.query.COUNT'"
           (click)="addSentence('COUNT()')"
         ></app-button>
+        @for(table of dataContext().schema.tables.map((table) => table); track table; let i = $index) {
+          <app-button
+            
+            type="button"
+            [labelKey]="table.name"
+            (click)="addSentence(table.name)"
+          ></app-button>
+        }
       </div>
       <label for="query" class="font-bold text-gray-800">{{
         'challenge.query.label' | translate
@@ -102,8 +112,11 @@ type QueryForm = FormGroup<{
   `,
 })
 export class ChallengeQueryForm {
+  private readonly autocompleteService = inject(SqlAutocompleteService);
+
   readonly form = input.required<QueryForm>();
   readonly isSubmitting = input(false);
+  readonly dataContext = input.required<DataContext>();
   readonly submitted = output<void>();
 
   @ViewChild('queryInput')
@@ -182,34 +195,27 @@ export class ChallengeQueryForm {
   }
 
   onQueryInput(): void {
-    const textArea = this.queryInput?.nativeElement;
-    if (!textArea) {
-      return;
-    }
+    const textarea = this.queryInput?.nativeElement;
 
-    const cursorPosition = textArea.selectionStart;
-    const textBeforeCursor = textArea.value.substring(0, cursorPosition);
+    if (!textarea) return;
 
-    const match = textBeforeCursor.match(/(\S+)$/);
-    if (!match) {
-      this.suggestions.set([]);
-      return;
-    }
-
-    const currentWord = match[0];
-    this.currentWordStart = cursorPosition - currentWord.length;
-    this.currentWordEnd = cursorPosition;
-
-    const filteredSuggestions = this.autocompleteOptions().filter((option) =>
-      option.toLowerCase().startsWith(currentWord.toLowerCase()),
+    const result = this.autocompleteService.getSuggestions(
+      textarea.value,
+      textarea.selectionStart,
+      this.dataContext().schema,
     );
 
-    this.suggestions.set(filteredSuggestions);
+    this.currentWordStart = result.start;
+    this.currentWordEnd = result.end;
+
+    this.suggestions.set(result.suggestions);
     this.activeSuggestionIndex.set(0);
-    if (filteredSuggestions.length > 0) {
+
+    if (result.suggestions.length > 0) {
       this.updateSuggestionPosition();
     }
   }
+
   onAutocompleteKeydown(event: KeyboardEvent): void {
     const suggestions = this.suggestions();
 
