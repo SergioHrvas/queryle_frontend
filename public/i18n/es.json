@@ -59,30 +59,47 @@
       "query": "Consulta SQL",
       "columnsCount": "Nº Columnas",
       "columnsNames": "Nombres",
+      "columnsOrder": "Orden Col",
       "rowsCount": "Nº Filas",
       "rowsData": "Datos",
-      "rowsOrder": "Orden"
+      "rowsOrder": "Orden Fil"
     },
     "help": {
       "columns": {
         "title": "Columnas",
-        "description": "Comprueba si el número de columnas es correcto."
+        "exact": "La cantidad de columnas coincide exactamente.",
+        "partial": "-",
+        "none": "La cantidad es diferente."
       },
       "names": {
         "title": "Nombres",
-        "description": "Comprueba si los nombres de las columnas coinciden."
+        "exact": "Están todos los nombres esperados, aunque haya columnas adicionales.",
+        "partial": "Coincide al menos un nombre.",
+        "none": "No coincide ningún nombre."
+      },
+      "columnsOrder": {
+        "title": "Orden de columnas",
+        "exact": "El orden de las columnas originales coincide exactamente.",
+        "partial": "Se conserva el orden relativo, pero hay columnas adicionales o faltantes.",
+        "none": "El orden relativo de las columnas no se conserva."
       },
       "rows": {
         "title": "Filas",
-        "description": "Comprueba si el número de filas es correcto."
+        "exact": "La cantidad de filas coincide exactamente.",
+        "partial": "-.",
+        "none": "La cantidad es diferente."
       },
       "data": {
         "title": "Datos",
-        "description": "Comprueba si los datos de las filas coinciden."
+        "exact": "Todos los datos coinciden como conjunto de filas.",
+        "partial": "Al menos una fila coincide.",
+        "none": "No coincide ninguna fila."
       },
-      "order": {
-        "title": "Orden",
-        "description": "Comprueba si el orden de las filas coincide."
+      "rowsOrder": {
+        "title": "Orden de filas",
+        "exact": "El orden de las filas originales coincide exactamente.",
+        "partial": "Se conserva el orden relativo, pero hay filas adicionales o faltantes.",
+        "none": "El orden relativo de las filas no se conserva."
       }
     },
     "empty": "Todavía no has enviado ningún intento."

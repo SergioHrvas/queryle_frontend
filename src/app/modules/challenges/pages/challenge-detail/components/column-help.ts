@@ -19,7 +19,20 @@ import { TranslatePipe } from "@ngx-translate/core";
                     : 'absolute left-1/2 top-full z-20 mt-2 w-56 max-w-[calc(100vw-2rem)] -translate-x-1/2 wrap-break-words whitespace-normal rounded-lg border border-emerald-200 bg-white p-3 text-left text-xs font-normal normal-case text-gray-700 shadow-lg'"
             >
                 <strong class="block text-emerald-700">{{ titleKey() | translate }}</strong>
-                {{ descriptionKey() | translate }}
+                <ul class="mt-2 space-y-1">
+                    <li>
+                        <strong class="font-semibold text-gray-800">🟩</strong>
+                        {{ (descriptionKey() + '.exact') | translate }}
+                    </li>
+                    <li>
+                        <strong class="font-semibold text-gray-800">🟨</strong>
+                        {{ (descriptionKey() + '.partial') | translate }}
+                    </li>
+                    <li>
+                        <strong class="font-semibold text-gray-800">🟥</strong>
+                        {{ (descriptionKey() + '.none') | translate }}
+                    </li>
+                </ul>
             </div>
         </details>
     `,
