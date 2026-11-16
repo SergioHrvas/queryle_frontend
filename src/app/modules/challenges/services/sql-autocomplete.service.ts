@@ -45,8 +45,17 @@ interface SqlToken {
   start: number;
 }
 
+/** Rango de texto de una (sub)consulta. */
+interface SqlScope {
+  start: number; // índice del primer carácter dentro del paréntesis
+  end: number; // índice del ')' (o fin del texto si aún no se cerró)
+}
+
 const JOINS = ['JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN'];
 const CONDITIONS = ['AND', 'OR', 'NOT', 'IN', 'LIKE', 'BETWEEN', 'IS NULL', 'IS NOT NULL'];
+
+const CLAUSE_REGEX =
+  /\b(SELECT|FROM|JOIN|ON|WHERE|GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|OFFSET)\b/gi;
 
 @Injectable({
   providedIn: 'root',
@@ -54,7 +63,7 @@ const CONDITIONS = ['AND', 'OR', 'NOT', 'IN', 'LIKE', 'BETWEEN', 'IS NULL', 'IS 
 export class SqlAutocompleteService {
   /** Keywords que tienen sentido mientras el cursor está dentro de cada cláusula. */
   private readonly clauseKeywords: Record<SqlClause, string[]> = {
-    UNKNOWN: ['SELECT'],
+    UNKNOWN: ['SELECT', 'WITH'],
     SELECT: ['DISTINCT', 'AS', 'FROM'],
     FROM: ['AS', ...JOINS, 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT'],
     JOIN: ['AS', 'ON'],
@@ -94,25 +103,51 @@ export class SqlAutocompleteService {
     'gi',
   );
 
+  // ---------------------------------------------------------------------------
+  // API pública
+  // ---------------------------------------------------------------------------
+
   getSuggestions(query: string, cursorPosition: number, schema: SqlSchema): SqlAutocompleteResult {
     const prefix = query.substring(0, cursorPosition);
     const token = this.getCurrentToken(prefix);
 
-    if (!token) {
+    if (!token || this.isInsideLiteralOrComment(prefix)) {
       return this.emptyResult(cursorPosition);
     }
 
-    const clause = this.getCurrentClause(prefix);
+    // Misma longitud que la query original, así los índices siguen valiendo.
+    const sanitized = this.sanitizeQuery(query);
+    const subqueries = this.findSubqueryScopes(sanitized);
+    const chain = this.getScopeChain(sanitized, subqueries, cursorPosition); // raíz → más interno
+    const current = chain[chain.length - 1];
+
+    // Texto del scope actual, sin el contenido de sus subconsultas hijas
+    const currentText = this.maskNestedScopes(sanitized, current, subqueries);
+
+    const clause = this.getCurrentClause(currentText.substring(current.start, cursorPosition));
     const context = this.getAutocompleteContext(clause);
-    const tableReferences = this.getTableReferences(query, schema);
-    const textBeforeToken = prefix.substring(0, token.start);
+
+    // Tablas visibles: primero las del scope actual y luego las de los exteriores
+    // (consultas correlacionadas). Los aliases internos sombrean a los externos.
+    const tableReferences = [...chain].reverse().flatMap((scope) =>
+      this.getTableReferences(
+        this.maskNestedScopes(sanitized, scope, subqueries).substring(scope.start, scope.end),
+        schema,
+      ),
+    );
+
+    // Alias definidos en el SELECT, utilizables en GROUP BY / HAVING / ORDER BY
+    const selectAliases = ['GROUP BY', 'HAVING', 'ORDER BY'].includes(clause)
+      ? this.getSelectAliases(currentText.substring(current.start, current.end))
+      : [];
 
     const suggestions = this.getContextSuggestions(
       context,
       clause,
       token,
-      textBeforeToken,
+      prefix.substring(0, token.start),
       tableReferences,
+      selectAliases,
       schema,
     );
 
@@ -122,6 +157,10 @@ export class SqlAutocompleteService {
       end: cursorPosition,
     };
   }
+
+  // ---------------------------------------------------------------------------
+  // Contexto y sugerencias
+  // ---------------------------------------------------------------------------
 
   private getAutocompleteContext(clause: SqlClause): SqlAutocompleteContext {
     switch (clause) {
@@ -148,6 +187,7 @@ export class SqlAutocompleteService {
     token: SqlToken,
     textBeforeToken: string,
     tableReferences: SqlTableReference[],
+    selectAliases: string[],
     schema: SqlSchema,
   ): string[] {
     // alias. -> solo columnas de esa tabla
@@ -155,20 +195,31 @@ export class SqlAutocompleteService {
       return this.getColumnsOfQualifier(token.qualifier, tableReferences, schema);
     }
 
+    // IN ( | EXISTS ( | ANY ( | ALL (  -> se espera una subconsulta
+    if (/\b(?:IN|EXISTS|ANY|ALL)\s*\(\s*$/i.test(textBeforeToken)) {
+      return ['SELECT'];
+    }
+
     const keywords = this.clauseKeywords[clause];
 
     switch (context) {
-        case 'TABLE': {
+      case 'TABLE': {
         if (this.expectsTableName(textBeforeToken)) {
-            return schema.tables.map((table) => table.name);
+          return schema.tables.map((table) => table.name);
         }
 
         return this.isRightAfterTableName(textBeforeToken)
-            ? keywords
-            : keywords.filter((keyword) => keyword !== 'AS');
-        }
+          ? keywords
+          : keywords.filter((keyword) => keyword !== 'AS');
+      }
+
       case 'COLUMN':
-        return [...this.getAvailableColumns(tableReferences, schema), ...this.functions, ...keywords];
+        return [
+          ...selectAliases,
+          ...this.getAvailableColumns(tableReferences, schema),
+          ...this.functions,
+          ...keywords,
+        ];
 
       case 'KEYWORD':
       default:
@@ -176,9 +227,14 @@ export class SqlAutocompleteService {
     }
   }
 
-    private isRightAfterTableName(textBeforeToken: string): boolean {
-        return /\b(?:FROM|JOIN)\s+[a-zA-Z_]\w*\s+$/i.test(textBeforeToken);
-    }
+  private isRightAfterTableName(textBeforeToken: string): boolean {
+    return /\b(?:FROM|JOIN)\s+[a-zA-Z_]\w*\s+$/i.test(textBeforeToken);
+  }
+
+  /** True si justo antes del token hay FROM, JOIN o una coma (se espera nombre de tabla). */
+  private expectsTableName(textBeforeToken: string): boolean {
+    return /\b(?:FROM|JOIN)\s+$/i.test(textBeforeToken) || /,\s*$/.test(textBeforeToken);
+  }
 
   private getColumnsOfQualifier(
     qualifier: string,
@@ -194,101 +250,42 @@ export class SqlAutocompleteService {
     return table?.columns.map((column) => column.name) ?? [];
   }
 
-  /** True si justo antes del token hay FROM, JOIN o una coma (se espera nombre de tabla). */
-  private expectsTableName(textBeforeToken: string): boolean {
-    return /\b(?:FROM|JOIN)\s+$/i.test(textBeforeToken) || /,\s*$/.test(textBeforeToken);
-  }
-
-  private getCurrentToken(prefix: string): SqlToken | null {
-    // Detecta "nombre", "alias.nombre" y "alias."
-    const match = prefix.match(/(?:(\w+)\.)?(\w*)$/);
-    if (!match) {
-      return null;
-    }
-
-    const word = match[2];
-    const qualifier = match[1] ?? null;
-
-    // Sin texto que completar solo sugerimos tras espacio o tras "alias."
-    if (!word && !qualifier && !/\s$/.test(prefix)) {
-      return null;
-    }
-
-    return {
-      word,
-      qualifier,
-      start: prefix.length - word.length,
-    };
-  }
-
-  private getCurrentClause(prefix: string): SqlClause {
-    const sanitized = this.sanitizeQuery(prefix);
-
-    const clauses: { clause: SqlClause; pattern: RegExp }[] = [
-      { clause: 'SELECT', pattern: /\bSELECT\b/gi },
-      { clause: 'FROM', pattern: /\bFROM\b/gi },
-      { clause: 'JOIN', pattern: /\bJOIN\b/gi },
-      { clause: 'ON', pattern: /\bON\b/gi },
-      { clause: 'WHERE', pattern: /\bWHERE\b/gi },
-      { clause: 'GROUP BY', pattern: /\bGROUP\s+BY\b/gi },
-      { clause: 'HAVING', pattern: /\bHAVING\b/gi },
-      { clause: 'ORDER BY', pattern: /\bORDER\s+BY\b/gi },
-      { clause: 'LIMIT', pattern: /\bLIMIT\b/gi },
-      { clause: 'OFFSET', pattern: /\bOFFSET\b/gi },
-    ];
-
-    let latestClause: SqlClause = 'UNKNOWN';
-    let latestIndex = -1;
-
-    for (const { clause, pattern } of clauses) {
-      let match: RegExpExecArray | null;
-
-      while ((match = pattern.exec(sanitized)) !== null) {
-        if (match.index > latestIndex) {
-          latestIndex = match.index;
-          latestClause = clause;
-        }
-      }
-    }
-
-    return latestClause;
-  }
-
-  private getTableReferences(query: string, schema: SqlSchema): SqlTableReference[] {
-    const sanitized = this.sanitizeQuery(query);
-    const references: SqlTableReference[] = [];
-
-    // Regex global compartida: reiniciamos el cursor antes de usarla.
-    this.tableReferenceRegex.lastIndex = 0;
-
-    let match: RegExpExecArray | null;
-
-    while ((match = this.tableReferenceRegex.exec(sanitized)) !== null) {
-      const tableName = match[1];
-
-      if (!this.findTable(tableName, schema)) {
-        continue;
-      }
-
-      references.push({
-        name: tableName,
-        alias: match[2] ?? tableName, // sin alias, usamos el nombre de la tabla
-      });
-    }
-
-    return references;
-  }
-
   private getAvailableColumns(references: SqlTableReference[], schema: SqlSchema): string[] {
-    const qualified: string[] = [];
-    const bare: string[] = [];
+    // Si un alias ya apareció en un scope más interno, el externo queda sombreado.
+    const seenAliases = new Set<string>();
+    const visible: { alias: string; table: SqlTable }[] = [];
 
     for (const reference of references) {
-      const table = this.findTable(reference.name, schema);
+      const key = reference.alias.toLowerCase();
+      if (seenAliases.has(key)) {
+        continue;
+      }
+      seenAliases.add(key);
 
-      for (const column of table?.columns ?? []) {
-        qualified.push(`${reference.alias}.${column.name}`);
-        bare.push(column.name);
+      const table = this.findTable(reference.name, schema);
+      if (table) {
+        visible.push({ alias: reference.alias, table });
+      }
+    }
+
+    // Una columna sin cualificar solo se sugiere si no es ambigua entre tablas.
+    const occurrences = new Map<string, number>();
+    for (const { table } of visible) {
+      for (const column of table.columns) {
+        const key = column.name.toLowerCase();
+        occurrences.set(key, (occurrences.get(key) ?? 0) + 1);
+      }
+    }
+
+    const bare: string[] = [];
+    const qualified: string[] = [];
+
+    for (const { alias, table } of visible) {
+      for (const column of table.columns) {
+        if (occurrences.get(column.name.toLowerCase()) === 1) {
+          bare.push(column.name);
+        }
+        qualified.push(`${alias}.${column.name}`);
       }
     }
 
@@ -302,6 +299,7 @@ export class SqlAutocompleteService {
   private filterSuggestions(suggestions: string[], currentWord: string): string[] {
     const word = currentWord.toLowerCase();
 
+    // El Set conserva el orden de inserción: columnas, funciones y keywords.
     return [...new Set(suggestions)].filter((suggestion) => {
       const s = suggestion.toLowerCase();
       // Sin duplicar lo que ya está escrito por completo
@@ -309,12 +307,228 @@ export class SqlAutocompleteService {
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // Token bajo el cursor
+  // ---------------------------------------------------------------------------
+
+  private getCurrentToken(prefix: string): SqlToken | null {
+    // Detecta "nombre", "alias.nombre" y "alias."
+    const match = prefix.match(/(?:(\w+)\.)?(\w*)$/);
+    if (!match) {
+      return null;
+    }
+
+    const word = match[2];
+    const qualifier = match[1] ?? null;
+
+    // Sin texto que completar solo sugerimos al inicio, tras espacio, "(" o ",", o tras "alias."
+    if (!word && !qualifier && prefix.length > 0 && !/[\s(,]$/.test(prefix)) {
+      return null;
+    }
+
+    return {
+      word,
+      qualifier,
+      start: prefix.length - word.length,
+    };
+  }
+
+  /** True si el cursor está dentro de un string, identificador entrecomillado o comentario. */
+  private isInsideLiteralOrComment(prefix: string): boolean {
+    let state: 'none' | 'single' | 'double' | 'line' | 'block' = 'none';
+
+    for (let i = 0; i < prefix.length; i++) {
+      const c = prefix[i];
+      const n = prefix[i + 1];
+
+      switch (state) {
+        case 'none':
+          if (c === "'") {
+            state = 'single';
+          } else if (c === '"') {
+            state = 'double';
+          } else if (c === '-' && n === '-') {
+            state = 'line';
+            i++;
+          } else if (c === '/' && n === '*') {
+            state = 'block';
+            i++;
+          }
+          break;
+
+        case 'single':
+          if (c === "'") {
+            if (n === "'") {
+              i++; // '' escapado
+            } else {
+              state = 'none';
+            }
+          }
+          break;
+
+        case 'double':
+          if (c === '"') {
+            if (n === '"') {
+              i++; // "" escapado
+            } else {
+              state = 'none';
+            }
+          }
+          break;
+
+        case 'line':
+          if (c === '\n') {
+            state = 'none';
+          }
+          break;
+
+        case 'block':
+          if (c === '*' && n === '/') {
+            state = 'none';
+            i++;
+          }
+          break;
+      }
+    }
+
+    return state !== 'none';
+  }
+
+  // ---------------------------------------------------------------------------
+  // Scopes (subconsultas)
+  // ---------------------------------------------------------------------------
+
+  /** Encuentra los "(" que abren una subconsulta y su ")" correspondiente. */
+  private findSubqueryScopes(sanitized: string): SqlScope[] {
+    const scopes: SqlScope[] = [];
+    const stack: (SqlScope | null)[] = [];
+    const subqueryStart = /\s*(?:SELECT|WITH)\b/iy;
+
+    for (let i = 0; i < sanitized.length; i++) {
+      const char = sanitized[i];
+
+      if (char === '(') {
+        subqueryStart.lastIndex = i + 1;
+
+        if (subqueryStart.test(sanitized)) {
+          const scope: SqlScope = { start: i + 1, end: sanitized.length };
+          scopes.push(scope);
+          stack.push(scope);
+        } else {
+          stack.push(null); // paréntesis de función, expresión, IN (1, 2)...
+        }
+      } else if (char === ')') {
+        const scope = stack.pop();
+        if (scope) {
+          scope.end = i;
+        }
+      }
+    }
+
+    return scopes;
+  }
+
+  /** Scopes que contienen el cursor, del exterior (sentencia actual) al interior. */
+  private getScopeChain(sanitized: string, subqueries: SqlScope[], cursor: number): SqlScope[] {
+    const statementStart = cursor > 0 ? sanitized.lastIndexOf(';', cursor - 1) + 1 : 0;
+    const nextSemicolon = sanitized.indexOf(';', cursor);
+
+    const root: SqlScope = {
+      start: statementStart,
+      end: nextSemicolon === -1 ? sanitized.length : nextSemicolon,
+    };
+
+    const containing = subqueries
+      .filter((s) => s.start <= cursor && cursor <= s.end)
+      .sort((a, b) => a.start - b.start);
+
+    return [root, ...containing];
+  }
+
+  /** Sustituye por espacios las subconsultas hijas para que sus keywords y tablas no contaminen. */
+  private maskNestedScopes(sanitized: string, scope: SqlScope, subqueries: SqlScope[]): string {
+    let text = sanitized;
+
+    for (const nested of subqueries) {
+      if (nested !== scope && nested.start >= scope.start && nested.end <= scope.end) {
+        text =
+          text.slice(0, nested.start) +
+          ' '.repeat(nested.end - nested.start) +
+          text.slice(nested.end);
+      }
+    }
+
+    return text;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Análisis de un scope
+  // ---------------------------------------------------------------------------
+
+  private getCurrentClause(scopeTextBeforeCursor: string): SqlClause {
+    // Ignora paréntesis ya cerrados (EXTRACT(YEAR FROM x), COUNT(*), IN (1, 2)...)
+    const text = this.blankClosedParentheses(scopeTextBeforeCursor);
+
+    let last: string | undefined;
+
+    for (const match of text.matchAll(CLAUSE_REGEX)) {
+      last = match[1];
+    }
+
+    return last ? (last.toUpperCase().replace(/\s+/g, ' ') as SqlClause) : 'UNKNOWN';
+  }
+
+  private blankClosedParentheses(text: string): string {
+    const blank = (match: string) => ' '.repeat(match.length);
+    let previous: string;
+
+    do {
+      previous = text;
+      text = text.replace(/\([^()]*\)/g, blank);
+    } while (text !== previous);
+
+    return text;
+  }
+
+  private getTableReferences(scopeText: string, schema: SqlSchema): SqlTableReference[] {
+    const references: SqlTableReference[] = [];
+
+    // matchAll clona la regex, así que no hay que reiniciar lastIndex.
+    for (const match of scopeText.matchAll(this.tableReferenceRegex)) {
+      if (this.findTable(match[1], schema)) {
+        references.push({
+          name: match[1],
+          alias: match[2] ?? match[1], // sin alias, usamos el nombre de la tabla
+        });
+      }
+    }
+
+    return references;
+  }
+
+  /** Alias `AS nombre` definidos entre el SELECT y el FROM del scope. */
+  private getSelectAliases(scopeText: string): string[] {
+    const select = scopeText.match(/\bSELECT\b([\s\S]*?)(?:\bFROM\b|$)/i);
+    if (!select) {
+      return [];
+    }
+
+    return [...select[1].matchAll(/\bAS\s+([a-zA-Z_]\w*)/gi)].map((match) => match[1]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Utilidades
+  // ---------------------------------------------------------------------------
+
+  /** Blanquea comentarios y strings conservando la longitud (y los saltos de línea). */
   private sanitizeQuery(query: string): string {
+    const blank = (match: string) => match.replace(/[^\n]/g, ' ');
+
     return query
-      .replace(/--.*$/gm, ' ')
-      .replace(/\/\*[\s\S]*?\*\//g, ' ')
-      .replace(/'(?:''|[^'])*'/g, ' ')
-      .replace(/"(?:[^"]|"")*"/g, ' ');
+      .replace(/--.*$/gm, blank)
+      .replace(/\/\*[\s\S]*?\*\//g, blank)
+      .replace(/'(?:''|[^'])*'/g, blank)
+      .replace(/"(?:[^"]|"")*"/g, blank);
   }
 
   private emptyResult(cursorPosition: number): SqlAutocompleteResult {
