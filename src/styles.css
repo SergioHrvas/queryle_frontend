@@ -2,7 +2,6 @@
 
 @import 'tailwindcss';
 
-
 .challenge-status--pending {
   --button-border: rgba(100, 116, 139, 0.7);
 }
