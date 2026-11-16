@@ -5,6 +5,20 @@ import { Button } from '@shared/components/button';
 import { DataContext } from '@modules/challenges/models/datacontext';
 import { SqlAutocompleteService } from '@modules/challenges/services/sql-autocomplete.service';
 
+const AUTOCOMPLETE_KEYWORDS = [
+    'SELECT',
+    'FROM',
+    'WHERE',
+    'GROUP BY',
+    'HAVING',
+    'ORDER BY',
+    'COUNT',
+    'SUM',
+    'AVG',
+    'MIN',
+    'MAX',
+];
+
 type QueryForm = FormGroup<{
   query: FormControl<string>;
 }>;
@@ -15,52 +29,23 @@ type QueryForm = FormGroup<{
   template: `
     <form class="flex flex-col gap-3 p-4" [formGroup]="form()" (ngSubmit)="submitted.emit()">
       <div class="flex flex-wrap gap-2">
-        <app-button
-          type="button"
-          [labelKey]="'challenge.query.select'"
-          (click)="addSentence('SELECT')"
-        ></app-button>
-        <app-button
-          type="button"
-          [labelKey]="'challenge.query.all'"
-          (click)="addSentence('*')"
-        ></app-button>
-        <app-button
-          type="button"
-          [labelKey]="'challenge.query.from'"
-          (click)="addSentence('FROM')"
-        ></app-button>
-        <app-button
-          type="button"
-          [labelKey]="'challenge.query.where'"
-          (click)="addSentence('WHERE')"
-        ></app-button>
-        <app-button
-          type="button"
-          [labelKey]="'challenge.query.groupBy'"
-          (click)="addSentence('GROUP BY')"
-        ></app-button>
-        <app-button
-          type="button"
-          [labelKey]="'challenge.query.having'"
-          (click)="addSentence('HAVING')"
-        ></app-button>
-        <app-button
-          type="button"
-          [labelKey]="'challenge.query.orderBy'"
-          (click)="addSentence('ORDER BY')"
-        ></app-button>
-        <app-button
-          type="button"
-          [labelKey]="'challenge.query.COUNT'"
-          (click)="addSentence('COUNT()')"
-        ></app-button>
+        @for(keyword of autocompleteOptions(); track keyword; let i = $index) {
+          <app-button
+            type="button"
+            [labelKey]="keyword"
+            (click)="addSentence(keyword)"
+            [color]="'rose'"
+          ></app-button>
+        }
+      </div>
+      <div class="flex flex-wrap gap-2">
         @for(table of dataContext().schema.tables.map((table) => table); track table; let i = $index) {
           <app-button
             
             type="button"
             [labelKey]="table.name"
             (click)="addSentence(table.name)"
+            [color]="'sky'"
           ></app-button>
         }
       </div>
@@ -122,19 +107,7 @@ export class ChallengeQueryForm {
   @ViewChild('queryInput')
   private readonly queryInput?: ElementRef<HTMLTextAreaElement>;
 
-  readonly autocompleteOptions = input<string[]>([
-    'SELECT',
-    'FROM',
-    'WHERE',
-    'GROUP BY',
-    'HAVING',
-    'ORDER BY',
-    'COUNT',
-    'SUM',
-    'AVG',
-    'MIN',
-    'MAX',
-  ]);
+  readonly autocompleteOptions = input<string[]>(AUTOCOMPLETE_KEYWORDS);
 
   readonly suggestions = signal<string[]>([]);
   readonly activeSuggestionIndex = signal<number>(0);
