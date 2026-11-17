@@ -23,6 +23,8 @@ export class ChallengeDetail {
 
     protected readonly state = signal<FetchState>('loading');
 
+    protected error = signal<string | null>(null);
+    
     private readonly challengeId = inject(ActivatedRoute).snapshot.paramMap.get('id');
     private readonly challenge = signal<DailyChallenge | null>(null);
     protected readonly form = new FormGroup({
@@ -82,6 +84,7 @@ export class ChallengeDetail {
             },
             error: (error) => {
                 console.error('Error fetching challenge:', error);
+                this.error.set(error.error.detail);
                 this.state.set('error');
             }
         });
