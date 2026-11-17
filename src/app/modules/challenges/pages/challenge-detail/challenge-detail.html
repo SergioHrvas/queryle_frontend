@@ -4,7 +4,7 @@
       <p>{{ 'common.loading' | translate }}</p>
     }
     @case ('error') {
-      <p class="text-red-600">{{ 'common.error' | translate }}</p>
+      <p class="text-red-600">{{ error() }}</p>
     }
     @case ('loaded') {
       @if (challenge(); as currentChallenge) {
