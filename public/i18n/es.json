@@ -107,6 +107,14 @@
   "challenge": {
     "query": {
       "label": "Consulta SQL",
+      "select": "SELECT",
+      "all": "*",
+      "from": "FROM",
+      "where": "WHERE",
+      "groupBy": "GROUP BY",
+      "having": "HAVING",
+      "orderBy": "ORDER BY",
+      "COUNT": "COUNT",
       "placeholder": "Escribe tu consulta SQL aquí...",
       "submit": "Enviar",
       "submitting": "Enviando..."

@@ -23,7 +23,9 @@
             @if (currentChallenge.game?.status !== "COMPLETED_WON" && currentChallenge.game?.status !== "COMPLETED_FAILED") {
             <app-challenge-query-form
               [form]="form"
+              [dataContext]="currentChallenge.dataContext"
               [isSubmitting]="isSubmitting()"
+              [popupWidth]="420"
               (submitted)="onSubmit()"
             />
             } @else if (hasWon()) {
