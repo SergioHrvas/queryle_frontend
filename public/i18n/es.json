@@ -143,5 +143,15 @@
   },
   "notification": {
     "close": "Cerrar"
+  },
+  "stats": {
+    "title": "Estadísticas",
+    "playedGames": "Retos jugados",
+    "wonGames": "Retos ganados",
+    "lostGames": "Retos perdidos",
+    "currentStreak": "Racha actual",
+    "longestStreak": "Racha máxima",
+    "loading": "Cargando estadísticas...",
+    "error": "No se han podido cargar las estadísticas."
   }
 }
