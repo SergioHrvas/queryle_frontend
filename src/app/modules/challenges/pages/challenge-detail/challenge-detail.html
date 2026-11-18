@@ -11,8 +11,9 @@
         <app-challenge-header [challenge]="currentChallenge" />
 
         <section class="overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50">
-          <div class="bg-emerald-700 p-3 text-center text-xl font-bold text-white">
-            {{ currentChallenge.dataContext.name }}
+          <div class="flex justify-center items-center gap-2 bg-emerald-700 p-3">
+            <span class="flex items-center justify-center text-xl font-bold bg-white size-10 rounded-full border-3 border-emerald-500">{{currentChallenge.dataContext.icon}}</span>
+            <span class="text-2xl font-bold text-white">{{ currentChallenge.dataContext.name }}</span>
           </div>
           <p class="p-3 text-justify text-gray-700">
             {{ currentChallenge.dataContext.description }}

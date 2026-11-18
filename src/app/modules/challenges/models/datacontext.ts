@@ -3,6 +3,7 @@ export interface DataContext {
     description: string;
     schema: Schema;
     dataset: Dataset;
+    icon: string;
 }
 
 export interface Schema {

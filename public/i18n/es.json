@@ -125,7 +125,7 @@
       "submitFailed": "No se ha podido enviar la consulta."
     },
     "data": {
-      "title": "Datos",
+      "title": "Tablas y datos",
       "primaryKey": "Clave primaria",
       "unknownType": "Tipo no disponible",
       "nullable": "Admite nulos",
