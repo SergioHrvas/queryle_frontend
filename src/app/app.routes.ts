@@ -21,6 +21,11 @@ export const routes: Routes = [
                 canActivate: [authGuard],
                 loadComponent: () => import('./modules/challenges/pages/challenge-detail/challenge-detail').then(m => m.ChallengeDetail)
             },
+            {
+                path: 'stats',
+                canActivate: [authGuard],
+                loadComponent: () => import('./modules/challenges/pages/player-stats/player-stats-detail').then(m => m.PlayerStatsDetail)
+            },
         ]
     },
     {
